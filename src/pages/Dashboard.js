@@ -1,45 +1,32 @@
 import TicketCard from "../components/TicketCard";
+import axios from "axios";
+import { useState, useEffect, useContext } from "react";
+import CategoriesContext from "../context";
 
 const Dashboard = () => {
-  const tickets = [
-    {
-      category: "Q1 2022",
-      color: "red",
-      title: "NFT Safety 101 Video",
-      owner: "Vinayaka Iyer",
-      avatar: "https://snipboard.io/9w1iyQ.jpg",
-      status: "done",
-      priority: 5,
-      progress: 40,
-      description:
-        "Make a video showcasing how to work with NFTs safely, including how to know if one is not genuine",
-      timestamp: "2022-03-11T07:36:17+0000",
-    },
-    {
-      category: "Q2 2022",
-      color: "red",
-      title: "Build and sell AI Model",
-      owner: "Vinayaka Iyer",
-      avatar: "https://snipboard.io/9w1iyQ.jpg",
-      status: "working on it",
-      priority: 2,
-      progress: 70,
-      description: "make a video about AI",
-      timestamp: "2022-03-11T07:36:17+0000",
-    },
-    {
-      category: "Q2 2022",
-      color: "blue",
-      title: "Build bot",
-      owner: "Vinayaka Iyer",
-      avatar: "https://snipboard.io/9w1iyQ.jpg",
-      status: "working on it",
-      priority: 3,
-      progress: 10,
-      description: "make a video about working on a bot",
-      timestamp: "2022-03-11T07:36:17+0000",
-    },
-  ];
+  const [tickets, setTickets] = useState(null);
+  const { categories, setCategories } = useContext(CategoriesContext);
+
+  useEffect(async () => {
+    const response = await axios.get("http://localhost:8000/tickets");
+
+    const dataObject = response.data.data;
+
+    const arrayOfKeys = Object.keys(dataObject);
+    const arrayOfData = Object.keys(dataObject).map((key) => dataObject[key]);
+    const formattedArray = [];
+    arrayOfKeys.forEach((key, index) => {
+      const formmatedData = { ...arrayOfData[index] };
+      formmatedData["documentId"] = key;
+      formattedArray.push(formmatedData);
+    });
+
+    setTickets(formattedArray);
+  }, []);
+
+  useEffect(() => {
+    setCategories([...new Set(tickets?.map(({ category }) => category))]);
+  }, [tickets]);
 
   const colors = [
     "rgb(255,179,186)",
@@ -52,8 +39,6 @@ const Dashboard = () => {
   const uniqueCategories = [
     ...new Set(tickets?.map(({ category }) => category)),
   ];
-  console.log(uniqueCategories);
-  console.log(tickets);
 
   return (
     <div className="dashboard">

@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import CategoriesContext from "../context";
 
 const TicketPage = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +12,21 @@ const TicketPage = () => {
   });
 
   const editMode = false;
-  const handleSubmit = () => {
-    console.log("submitted");
+  const { categories, setCategories } = useContext(CategoriesContext);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!editMode) {
+      const response = await axios.post("http://localhost:8000/tickets", {
+        formData,
+      });
+      const success = response.status === 200;
+      if (success) {
+        navigate("/");
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -20,7 +36,6 @@ const TicketPage = () => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const categories = ["test1", "test2"];
   return (
     <div className="ticket">
       <h1>{editMode ? "Update your ticket" : "create your ticket"}</h1>
@@ -48,7 +63,7 @@ const TicketPage = () => {
             <label>Category</label>
             <select
               name="category"
-              value={formData.category}
+              value={formData.category || categories[0]}
               onChange={handleChange}
             >
               {categories?.map((category, _index) => (
@@ -64,7 +79,6 @@ const TicketPage = () => {
               name="category"
               id="new-category"
               onChange={handleChange}
-              required={true}
               value={formData.category}
             />
 
@@ -76,7 +90,7 @@ const TicketPage = () => {
                 name="priority"
                 onChange={handleChange}
                 value={1}
-                checked={formData.priority === 1}
+                checked={formData.priority == 1}
               />
               <label htmlFor="priority-1">1</label>
               <input
@@ -85,7 +99,7 @@ const TicketPage = () => {
                 name="priority"
                 onChange={handleChange}
                 value={2}
-                checked={formData.priority === 2}
+                checked={formData.priority == 2}
               />
               <label htmlFor="priority-2">2</label>
               <input
@@ -94,7 +108,7 @@ const TicketPage = () => {
                 name="priority"
                 onChange={handleChange}
                 value={3}
-                checked={formData.priority === 3}
+                checked={formData.priority == 3}
               />
               <label htmlFor="priority-3">3</label>
               <input
@@ -103,7 +117,7 @@ const TicketPage = () => {
                 name="priority"
                 onChange={handleChange}
                 value={4}
-                checked={formData.priority === 4}
+                checked={formData.priority == 4}
               />
               <label htmlFor="priority-4">4</label>
               <input
@@ -112,7 +126,7 @@ const TicketPage = () => {
                 name="priority"
                 onChange={handleChange}
                 value={5}
-                checked={formData.priority === 5}
+                checked={formData.priority == 5}
               />
               <label htmlFor="priority-5">5</label>
 
@@ -184,9 +198,7 @@ const TicketPage = () => {
             />
 
             <div className="image-preview">
-              {formData.avatar && (
-                <img src={formData.avatar} alt="image preview" />
-              )}
+              {formData.avatar && <img src={formData.avatar} alt="preview" />}
             </div>
           </section>
         </form>
