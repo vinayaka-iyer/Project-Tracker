@@ -18,8 +18,7 @@ function App() {
             <Route path="/ticket" element={<TicketPage />} />
             <Route
               path="/ticket/:id"
-              element={<TicketPage />}
-              editMode={true}
+              element={<TicketPage editMode={true} />}
             />
           </Routes>
         </BrowserRouter>
